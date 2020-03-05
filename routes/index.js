@@ -5,6 +5,8 @@ module.exports = function(sockIO, i18n) {
     var mysql = require('mysql')
     const moment = require("moment");
     require('dotenv').config({ path: 'push-server-config.env' });
+
+    console.log('run heree');
     // var connection = mysql.createConnection({
     //   host: process.env.HOST,
     //   user: process.env.USERNAME,
