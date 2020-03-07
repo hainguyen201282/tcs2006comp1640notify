@@ -76,7 +76,7 @@ module.exports = function(sockIO, i18n) {
                 const currentTime = moment().unix();
                 res = response(1, "success", {'eventName': data['eventName']});
                 console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                socket.emit("subscribe_callback", res);
+                socket.broadcast.emit("subscribe_callback", res);
                 // customerRoom = process.env.CUSTOMER_ROOM_SUFFIX;
                 // let subscribeRoomSocketSQL = '';
                 // subscribeRoomSocketSQL = "INSERT INTO `chat_group_socket`(`id`, `group_id`, `socket_id`, `created_at`) VALUES ('" + create_UUID() + "', '" + customerRoom + "','" + socket.id + "'," + currentTime + ");";
