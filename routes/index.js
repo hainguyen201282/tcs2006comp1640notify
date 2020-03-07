@@ -74,7 +74,7 @@ module.exports = function(sockIO, i18n) {
                 // const roomId = data['room_id'];
                 
                 const currentTime = moment().unix();
-                res = response(1, "success", {socket_id: socket.id});
+                res = response(1, "success", {'eventName': data['eventName']});
                 console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
                 socket.emit("subscribe_callback", res);
                 // customerRoom = process.env.CUSTOMER_ROOM_SUFFIX;
