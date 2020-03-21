@@ -2,16 +2,15 @@ module.exports = function(sockIO, i18n) {
     var express = require('express');
     const jwt = require("jsonwebtoken");
     var router = express.Router();
-    var mysql = require('mysql')
+    var mysql = require('mariadb');
     const moment = require("moment");
     require('dotenv').config({ path: 'push-server-config.env' });
-    var connection = mysql.createConnection({
+    var pool  = mysql.createPool({
       host: process.env.HOST,
       user: process.env.USERNAME,
       password: process.env.PASSWORD,
       database: process.env.DATABASE
-    })
-    connection.connect()
+    });
 
     /* GET home page. */
     router.get('/', function(request, response, next) {
@@ -68,23 +67,46 @@ module.exports = function(sockIO, i18n) {
                     case "assign_student_to_tutor":
 
                         let findUserInfo = "SELECT * FROM `tbl_users` WHERE `userId` = " + data['tutor_id'];
-                        connection.query(findUserInfo, function (err, rows, fields) {
-                            let tutorName = ''
-                            if (rows.length > 0) {
-                                tutorName = rows[0].name;
-                            }
 
-                            const payload = {
-                                'eventName': data['eventName'], 
-                                'student_ids': data['student_ids'], 
-                                'tutor_id': data['tutor_id'],
-                                'tutor_name': tutorName
-                            };
-                            res = response(1, "success", payload);
-                            console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                            socket.broadcast.emit("send_notification_callback", res);
+                        pool.getConnection()
+                        .then(conn => {
                         
+                          conn.query(findUserInfo)
+                            .then(rows => { // rows: [ {val: 1}, meta: ... ]
+                              console.log(rows);
+                            })
+                            .then(res => { // res: { affectedRows: 1, insertId: 1, warningStatus: 0 }
+                              console.log('res', res);
+                              conn.release(); // release to pool
+                            })
+                            .catch(err => {
+                              console.log('query error', err);
+                              conn.release(); // release to pool
+                            })
+                            
+                        }).catch(err => {
+                            console.log('connection error', err);
+                          //not connected
                         });
+
+                        
+                        // connection.query(findUserInfo, function (err, rows, fields) {
+                        //     let tutorName = ''
+                        //     if (rows.length > 0) {
+                        //         tutorName = rows[0].name;
+                        //     }
+
+                        //     const payload = {
+                        //         'eventName': data['eventName'], 
+                        //         'student_ids': data['student_ids'], 
+                        //         'tutor_id': data['tutor_id'],
+                        //         'tutor_name': tutorName
+                        //     };
+                        //     res = response(1, "success", payload);
+                        //     console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
+                        //     socket.broadcast.emit("send_notification_callback", res);
+                        
+                        // });
                         
                     break;
                 }
