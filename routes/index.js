@@ -57,73 +57,27 @@ module.exports = function(sockIO, i18n) {
                 console.log(nspPrefixDefault + " Socket.IO Error");
                 console.log(err.stack);
             });
-            //get disconnect
-            socket.on("disconnect", function (reason) {
-                noOfConnection--;
-                let socketId = socket.id;
-
-                // console.log(nspPrefixDefault + " chat server disconnect with socket id: " + socket.id);
-                // res = response(1, "success", {socket_id: socket.id});
-                // console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                // socket.emit("disconnect_callback", res);
-            });
-            //listen subscribe from client (apply for mobile client)
-            socket.on("subscribe", (data) => {
-                console.log(nspPrefixDefault + " new subscribe: " + JSON.stringify(data) + " with socket id: " + socket.id);
-                
-                // const roomId = data['room_id'];
-                
+ 
+            socket.on("send_notification", (data) => {
+                console.log(nspPrefixDefault + " new notification: " + JSON.stringify(data) + " with socket id: " + socket.id);
                 const currentTime = moment().unix();
-                res = response(1, "success", {'eventName': data['eventName']});
-                console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                socket.broadcast.emit("subscribe_callback", res);
-                // customerRoom = process.env.CUSTOMER_ROOM_SUFFIX;
-                // let subscribeRoomSocketSQL = '';
-                // subscribeRoomSocketSQL = "INSERT INTO `chat_group_socket`(`id`, `group_id`, `socket_id`, `created_at`) VALUES ('" + create_UUID() + "', '" + customerRoom + "','" + socket.id + "'," + currentTime + ");";
-                // socket.join(customerRoom);
-
-                // let findRoomSQL = "SELECT * FROM `chat_group_socket` WHERE `group_id` IN (" + roomString + ") AND socket_id = '" + oldSocketId + "' AND isEnabled = 1";
-                // connection.query(findRoomSQL, function (err, rows, fields) {
-                // });
                 
-                // connection.query(subscribeRoomSocketSQL, function (err, rows, fields) {
-                    
-                //         console.log(nspPrefixDefault + " insertRoomSocketSQL: insert/update Group Socket Successfully ");
-                //         res = response(1, "success", {socket_id: socket.id});
-                //         console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                //         socket.emit("subscribe_callback", res);
-                //     });
-
-
-            })
-
-            socket.on("send_message", (data) => {
-                console.log(nspPrefixDefault + " get data send msg at: " + moment().unix() + " with data: " + JSON.stringify(data));
-                if (!data) {
-                    return null;
+                const eventName = data['eventName'];
+                
+                switch(eventName){
+                    case "assign_student_to_tutor":
+                        const payload = {
+                            'eventName': data['eventName'], 
+                            'student_ids': data['student_ids'], 
+                            'tutor_id': data['tutor_id']
+                        };
+                        res = response(1, "success", payload);
+                        console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
+                        socket.broadcast.emit("send_notification_callback", res);
+                    break;
                 }
 
-                // const roomId = data['room_id'];
-                // const currentTime = moment().unix();
-
-                // const newGroupMessageId = create_UUID();
-                // res = response(1, "success", messageInfo);
-                // console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                // sockIO.to((chatRoomType == process.env.CHAT_ROOM_TYPE_HANDYMAN) ? handymanRoom : customerRoom).emit("send_message_callback", res); 
-                // sockIO.to(process.env.PUSH_NOTIFICATION_ROOM).emit("send_message_callback", res); 
-                
-            });
-
-            //reconnect
-            socket.on("reconnect", function (data) {
-                console.log(nspPrefixDefault + " reconnect " + data['socket_id']);
-                const oldSocketId = data['socket_id'];
-                
-                // let token = data['authorization'];
-                // console.log("token input: " + token);
-                // const tokenInfo = decodeToken(token);
-
-            });
+            })
     });
 
     function create_UUID(){
