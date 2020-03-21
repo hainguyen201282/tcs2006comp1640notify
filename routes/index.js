@@ -73,7 +73,20 @@ module.exports = function(sockIO, i18n) {
                         
                           conn.query(findUserInfo)
                             .then(rows => { // rows: [ {val: 1}, meta: ... ]
-                              console.log(rows);
+                                let tutorName = ''
+                                if (rows.length > 0) {
+                                    tutorName = rows[0].name;
+                                }
+
+                                const payload = {
+                                    'eventName': data['eventName'], 
+                                    'student_ids': data['student_ids'], 
+                                    'tutor_id': data['tutor_id'],
+                                    'tutor_name': tutorName
+                                };
+                                res = response(1, "success", payload);
+                                console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
+                                socket.broadcast.emit("send_notification_callback", res);
                             })
                             .then(res => { // res: { affectedRows: 1, insertId: 1, warningStatus: 0 }
                               console.log('res', res);
@@ -88,25 +101,6 @@ module.exports = function(sockIO, i18n) {
                             console.log('connection error', err);
                           //not connected
                         });
-
-                        
-                        // connection.query(findUserInfo, function (err, rows, fields) {
-                        //     let tutorName = ''
-                        //     if (rows.length > 0) {
-                        //         tutorName = rows[0].name;
-                        //     }
-
-                        //     const payload = {
-                        //         'eventName': data['eventName'], 
-                        //         'student_ids': data['student_ids'], 
-                        //         'tutor_id': data['tutor_id'],
-                        //         'tutor_name': tutorName
-                        //     };
-                        //     res = response(1, "success", payload);
-                        //     console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                        //     socket.broadcast.emit("send_notification_callback", res);
-                        
-                        // });
                         
                     break;
                 }
