@@ -5,13 +5,13 @@ module.exports = function(sockIO, i18n) {
     var mysql = require('mysql')
     const moment = require("moment");
     require('dotenv').config({ path: 'push-server-config.env' });
-    // var connection = mysql.createConnection({
-    //   host: process.env.HOST,
-    //   user: process.env.USERNAME,
-    //   password: process.env.PASSWORD,
-    //   database: process.env.DATABASE
-    // })
-    // connection.connect()
+    var connection = mysql.createConnection({
+      host: process.env.HOST,
+      user: process.env.USERNAME,
+      password: process.env.PASSWORD,
+      database: process.env.DATABASE
+    })
+    connection.connect()
 
     /* GET home page. */
     router.get('/', function(request, response, next) {
@@ -63,17 +63,29 @@ module.exports = function(sockIO, i18n) {
                 const currentTime = moment().unix();
                 
                 const eventName = data['eventName'];
-                
+
                 switch(eventName){
                     case "assign_student_to_tutor":
-                        const payload = {
-                            'eventName': data['eventName'], 
-                            'student_ids': data['student_ids'], 
-                            'tutor_id': data['tutor_id']
-                        };
-                        res = response(1, "success", payload);
-                        console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
-                        socket.broadcast.emit("send_notification_callback", res);
+
+                        let findUserInfo = "SELECT * FROM `tbl_users` WHERE `userId` = " + data['tutor_id'];
+                        connection.query(findUserInfo, function (err, rows, fields) {
+                            let tutorName = ''
+                            if (rows.length > 0) {
+                                tutorName = rows[0].name;
+                            }
+
+                            const payload = {
+                                'eventName': data['eventName'], 
+                                'student_ids': data['student_ids'], 
+                                'tutor_id': data['tutor_id'],
+                                'tutor_name': tutorName
+                            };
+                            res = response(1, "success", payload);
+                            console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
+                            socket.broadcast.emit("send_notification_callback", res);
+                        
+                        });
+                        
                     break;
                 }
 
