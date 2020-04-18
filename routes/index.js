@@ -82,7 +82,9 @@ module.exports = function(sockIO, i18n) {
                                     'eventName': data['eventName'], 
                                     'student_ids': data['student_ids'], 
                                     'tutor_id': data['tutor_id'],
-                                    'tutor_name': tutorName
+                                    'tutor_name': data['tutor_name'] ? data['tutor_name'] : tutorName,
+                                    'student_name': data['student_name'] ? data['student_name'] : "",
+                                    'sent_by_student': data['sent_by_student'] ? data['sent_by_student'] : ""
                                 };
                                 res = response(1, "success", payload);
                                 console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
