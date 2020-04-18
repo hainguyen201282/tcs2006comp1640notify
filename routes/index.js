@@ -65,6 +65,7 @@ module.exports = function(sockIO, i18n) {
 
                 switch(eventName){
                     case "assign_student_to_tutor":
+                    case "send_message":
 
                         let findUserInfo = "SELECT * FROM `tbl_users` WHERE `userId` = " + data['tutor_id'];
 
