@@ -109,6 +109,7 @@ module.exports = function(sockIO, i18n) {
 
 
                     case "invite_student_to_conference":
+                    case "student_leave_conference":
                         const payload = {
                             'eventName': data['eventName'], 
                             'student_ids': data['student_ids'], 
