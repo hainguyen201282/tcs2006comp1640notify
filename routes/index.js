@@ -66,6 +66,7 @@ module.exports = function(sockIO, i18n) {
                 switch(eventName){
                     case "assign_student_to_tutor":
                     case "send_message":
+                    case "invite_student_to_conference":
 
                         let findUserInfo = "SELECT * FROM `tbl_users` WHERE `userId` = " + data['tutor_id'];
 
@@ -85,7 +86,11 @@ module.exports = function(sockIO, i18n) {
                                     'tutor_id': data['tutor_id'],
                                     'tutor_name': data['tutor_name'] ? data['tutor_name'] : tutorName,
                                     'student_name': data['student_name'] ? data['student_name'] : "",
-                                    'sent_by_student': data['sent_by_student'] ? data['sent_by_student'] : ""
+                                    'sent_by_student': data['sent_by_student'] ? data['sent_by_student'] : "",
+                                    'sender_id': data['sender_id'] ? data['sender_id'] : "",
+                                    'sender_role': data['sender_role'] ? data['sender_role'] : "",
+                                    'sender_name': data['sender_name'] ? data['sender_name'] : ""
+
                                 };
                                 res = response(1, "success", payload);
                                 console.log(nspPrefixDefault + " response data: " + JSON.stringify(res));
